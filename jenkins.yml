@@ -26,7 +26,7 @@ spec:
           failureThreshold: 5
         env:
         - name: JAVA_OPTS
-          value: "-Djenkins.install.runSetupWizard=false -Dpermissive-script-security.enabled=NO_SECURITY"
+          value: "-Djenkins.install.runSetupWizard=false"
         volumeMounts:
         - mountPath: /usr/share/jenkins/ref
           name: ref-volume
@@ -35,21 +35,14 @@ spec:
         lifecycle:
           postStart:
             exec:
-              command: ["/bin/sh", "-c", "/usr/share/jenkins/ref/connect-jenkins-bootstrap/scripts/wait-for-jenkins-and-run-job.sh meta-job"]
+              command: ["/bin/sh", "-c", "/usr/share/jenkins/ref/connect-jenkins-bootstrap/scripts/wait-for-jenkins-and-run-job.sh test"]
       initContainers:
       - name: clone-repo
         image: jenkins/jenkins:lts
         command:
           - /bin/sh
           - -c
-          - cp /etc/secret-volume/ssh-privatekey ~/.ssh/id_rsa;
-            cp /etc/secret-volume/ssh-publickey ~/.ssh/id_rsa.pub;
-            chmod 400 ~/.ssh/*;
-            printf "host github.com\n HostName github.com\n IdentityFile ~/.ssh/id_rsa\n User jenkins" > ~/.ssh/config;
-            ssh-keyscan github.com >> ~/.ssh/known_hosts;
-            cd /usr/share/jenkins/ref;
-            git clone git@github.com:ClearPointNZ/connect-jenkins-bootstrap.git
-
+          - cp /etc/secret-volume/ssh-privatekey ~/.ssh/id_rsa;cp /etc/secret-volume/ssh-publickey ~/.ssh/id_rsa.pub;chmod 400 ~/.ssh/*;printf "host github.com\n HostName github.com\n IdentityFile ~/.ssh/id_rsa\n User jenkins" > ~/.ssh/config;ssh-keyscan github.com >> ~/.ssh/known_hosts;cd /usr/share/jenkins/ref && git clone git@github.com:darthShana/connect-jenkins-bootstrap.git
         volumeMounts:
         - mountPath: /usr/share/jenkins/ref
           name: ref-volume
@@ -82,10 +75,7 @@ spec:
         command:
           - /bin/sh
           - -c
-          - mkdir /usr/share/jenkins/ref/init.groovy.d;
-            cp /usr/share/jenkins/ref/connect-jenkins-bootstrap/overrides/* /usr/share/jenkins/ref/;
-            cp /usr/share/jenkins/ref/connect-jenkins-bootstrap/scripts/security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy;
-            /usr/share/jenkins/ref/connect-jenkins-bootstrap/scripts/hack-jenkins-env.sh;
+          - cp /usr/share/jenkins/ref/connect-jenkins-bootstrap/overrides/config.xml.override /usr/share/jenkins/ref/config.xml.override && /usr/share/jenkins/ref/connect-jenkins-bootstrap/scripts/hack-jenkins-env.sh && mkdir /usr/share/jenkins/ref/init.groovy.d && cp /usr/share/jenkins/ref/connect-jenkins-bootstrap/scripts/security.groovy /usr/share/jenkins/ref/init.groovy.d/security.groovy
         volumeMounts:
         - mountPath: /usr/share/jenkins/ref
           name: ref-volume
