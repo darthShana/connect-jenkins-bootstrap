@@ -9,7 +9,7 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <url>git@github.com:darthShana/jenkins-sample-application.git</url>
-        <credentialsId>jenkins-clearpoint</credentialsId>
+        <credentialsId>jenkins-twg</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
